@@ -74,6 +74,7 @@ graph TD
     D -->|Processed Data| C
     C -->|Processed Data| B
     B -->|HTTP Response| A
+```
 
 ### Register Flow
 
