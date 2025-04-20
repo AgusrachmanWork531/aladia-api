@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/users.schema';
 import { CacheService } from 'src/cache/cache.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -18,8 +19,12 @@ export class UsersService {
 
     async create(createUserDto: CreateUserDto) {
         const createdUser = new this.userModel(createUserDto);
+        const hashedPassword = await this.hashPassword(createdUser.password);
+        createdUser.password = hashedPassword; // Hash the password before saving
         await this.cacheService.del('users'); // Clear the cache when a new user is created
-        return createdUser.save();
+        await createdUser.save();
+        const { password,...safeUser } = createdUser.toObject();
+        return safeUser;
     }
 
     async findAll() {
@@ -40,6 +45,14 @@ export class UsersService {
         return user;
     }
 
+    async findByEmail(email: string) {
+        const user = await this.userModel.findOne({ email }).exec();
+        if (!user) {
+            throw new NotFoundException(`User with email ${email} not found`);
+        }
+        return user;
+    }
+
     async update(id: number, updateUserDto: UpdateUserDto) {
         const updatedUser = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
         if (!updatedUser) {
@@ -56,5 +69,10 @@ export class UsersService {
         }
         await this.cacheService.del('users'); // Clear the cache when a user is deleted
         return deleted;
+    }
+
+    async hashPassword(password: string): Promise<string> {
+        const salt = await bcrypt.genSalt(10);
+        return await bcrypt.hash(password, salt);
     }
 }

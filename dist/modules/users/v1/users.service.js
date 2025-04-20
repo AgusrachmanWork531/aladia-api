@@ -18,6 +18,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const users_schema_1 = require("./schemas/users.schema");
 const cache_service_1 = require("../../../cache/cache.service");
+const bcrypt = require("bcrypt");
 let UsersService = class UsersService {
     constructor(userModel, cacheService) {
         this.userModel = userModel;
@@ -26,8 +27,12 @@ let UsersService = class UsersService {
     }
     async create(createUserDto) {
         const createdUser = new this.userModel(createUserDto);
+        const hashedPassword = await this.hashPassword(createdUser.password);
+        createdUser.password = hashedPassword;
         await this.cacheService.del('users');
-        return createdUser.save();
+        await createdUser.save();
+        const { password, ...safeUser } = createdUser.toObject();
+        return safeUser;
     }
     async findAll() {
         const cachedUsers = await this.cacheService.get('users');
@@ -42,6 +47,13 @@ let UsersService = class UsersService {
         const user = await this.userModel.findById(id).exec();
         if (!user) {
             throw new common_1.NotFoundException(`User with ID ${id} not found`);
+        }
+        return user;
+    }
+    async findByEmail(email) {
+        const user = await this.userModel.findOne({ email }).exec();
+        if (!user) {
+            throw new common_1.NotFoundException(`User with email ${email} not found`);
         }
         return user;
     }
@@ -60,6 +72,10 @@ let UsersService = class UsersService {
         }
         await this.cacheService.del('users');
         return deleted;
+    }
+    async hashPassword(password) {
+        const salt = await bcrypt.genSalt(10);
+        return await bcrypt.hash(password, salt);
     }
 };
 exports.UsersService = UsersService;

@@ -4,9 +4,20 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export declare class UsersController {
     private readonly usersService;
     constructor(usersService: UsersService);
-    create(createUserDto: CreateUserDto): Promise<import("mongoose").Document<unknown, {}, import("./schemas/users.schema").UserDocument> & import("./schemas/users.schema").User & import("mongoose").Document<unknown, any, any> & Required<{
+    create(createUserDto: CreateUserDto): Promise<{
+        username: string;
+        email: string;
         _id: unknown;
-    }> & {
+        $locals: Record<string, unknown>;
+        $op: "save" | "validate" | "remove" | null;
+        $where: Record<string, unknown>;
+        baseModelName?: string;
+        collection: import("mongoose").Collection;
+        db: import("mongoose").Connection;
+        errors?: import("mongoose").Error.ValidationError;
+        id?: any;
+        isNew: boolean;
+        schema: import("mongoose").Schema;
         __v: number;
     }>;
     findAll(): Promise<any>;

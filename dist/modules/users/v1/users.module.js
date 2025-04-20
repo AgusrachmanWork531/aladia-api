@@ -23,7 +23,8 @@ exports.UsersModule = UsersModule = __decorate([
             cache_module_1.CacheModule
         ],
         providers: [users_service_1.UsersService],
-        controllers: [users_controller_1.UsersController]
+        controllers: [users_controller_1.UsersController],
+        exports: [users_service_1.UsersService],
     })
 ], UsersModule);
 //# sourceMappingURL=users.module.js.map

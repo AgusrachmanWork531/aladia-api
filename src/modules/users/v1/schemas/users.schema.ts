@@ -11,6 +11,10 @@ export class User {
     // The user's age, which is required.
     @Prop({ required: true, unique: true })
     email: string;
+
+    // The user's password, which is required.
+    @Prop({ required: true })
+    password: string;
 }
 
 // The UserDocument type is a Mongoose document that includes the User schema.

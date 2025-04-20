@@ -13,6 +13,7 @@ import { CacheModule } from 'src/cache/cache.module';
     CacheModule
   ],
   providers: [UsersService],
-  controllers: [UsersController]
+  controllers: [UsersController],
+  exports: [UsersService], // Export the UsersService so it can be used in other modules
 })
 export class UsersModule {}
