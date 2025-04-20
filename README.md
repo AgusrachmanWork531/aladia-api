@@ -158,3 +158,48 @@ sequenceDiagram
     Controller-->>Client: return JWT and user details
 ```
 
+### Get Me Flow
+
+Below is the detailed flow for the "Get Me" process:
+
+1. **Client Request**:
+   - The client sends a `GET` request to the `/auth/me` endpoint with a valid JWT token in the `Authorization` header.
+
+2. **Middleware**:
+   - The authentication middleware validates the JWT token.
+   - If the token is valid, it extracts the user ID and attaches it to the request object.
+
+3. **Controller**:
+   - The `AuthController` receives the request and calls the `getMe` method.
+   - The `getMe` method forwards the user ID to the `AuthService`.
+
+4. **Service**:
+   - The `AuthService` retrieves the user details by querying the database through the `UsersRepository`.
+
+5. **Repository**:
+   - The `UsersRepository` fetches the user data from the database based on the user ID.
+
+6. **Response**:
+   - The `AuthController` sends the user details back to the client as a response.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Middleware
+    participant Controller
+    participant Service
+    participant Repository
+    participant Database
+
+    Client->>Middleware: GET /auth/me (JWT token)
+    Middleware->>Middleware: validate JWT
+    Middleware->>Controller: attach user ID to request
+    Controller->>Service: call getMe(user ID)
+    Service->>Repository: query user by ID
+    Repository->>Database: fetch user data
+    Database-->>Repository: return user data
+    Repository-->>Service: return user data
+    Service-->>Controller: return user details
+    Controller-->>Client: return user details
+```
+
