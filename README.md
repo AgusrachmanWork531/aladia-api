@@ -118,3 +118,43 @@ sequenceDiagram
     Controller-->>Client: return created user
 ```
 
+### Login Flow
+
+Below is the detailed flow for the "Login" process:
+
+1. **Client Request**:
+   - The client sends a `POST` request to the `/auth/login` endpoint with login credentials (e.g., `email`, `password`).
+
+2. **Controller**:
+   - The `AuthController` receives the request and calls the `login` method.
+   - The `login` method validates the input using DTOs and forwards the data to the `AuthService`.
+
+3. **Service**:
+   - The `AuthService` verifies the credentials by querying the database through the `UsersRepository`.
+   - If the credentials are valid, it generates a JWT token.
+
+4. **Repository**:
+   - The `UsersRepository` retrieves the user data from the database based on the provided email.
+
+5. **Response**:
+   - The `AuthController` sends the JWT token and user details back to the client as a response.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant Service
+    participant Repository
+    participant Database
+
+    Client->>Controller: POST /auth/login (credentials)
+    Controller->>Service: validate and call login()
+    Service->>Repository: query user by email
+    Repository->>Database: fetch user data
+    Database-->>Repository: return user data
+    Repository-->>Service: return user data
+    Service->>Service: validate password and generate JWT
+    Service-->>Controller: return JWT and user details
+    Controller-->>Client: return JWT and user details
+```
+
