@@ -75,3 +75,45 @@ graph TD
     C -->|Processed Data| B
     B -->|HTTP Response| A
 
+### Register Flow
+
+Below is the detailed flow for the "Register" process:
+
+1. **Client Request**:
+   - The client sends a `POST` request to the `/users` endpoint with the user data (e.g., `username`, `email`).
+
+2. **Controller**:
+   - The `UsersController` receives the request and calls the `create` method.
+   - The `create` method validates the input using DTOs and forwards the data to the `UsersService`.
+
+3. **Service**:
+   - The `UsersService` processes the business logic.
+   - It calls the `UsersRepository` to interact with the database.
+
+4. **Repository**:
+   - The `UsersRepository` uses the `UserModel` (Mongoose) to save the user data in the MongoDB database.
+
+5. **Database**:
+   - MongoDB stores the user data and returns the created user object.
+
+6. **Response**:
+   - The `UsersController` sends the created user object back to the client as a response.
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant Service
+    participant Repository
+    participant Database
+
+    Client->>Controller: POST /users (user data)
+    Controller->>Service: validate and call create()
+    Service->>Repository: call save method
+    Repository->>Database: save user data
+    Database-->>Repository: return created user
+    Repository-->>Service: return created user
+    Service-->>Controller: return created user
+    Controller-->>Client: return created user
+```
+
