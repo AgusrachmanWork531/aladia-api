@@ -9,11 +9,7 @@ export declare class UsersController {
     }> & {
         __v: number;
     }>;
-    findAll(): Promise<(import("mongoose").Document<unknown, {}, import("./schemas/users.schema").UserDocument> & import("./schemas/users.schema").User & import("mongoose").Document<unknown, any, any> & Required<{
-        _id: unknown;
-    }> & {
-        __v: number;
-    })[]>;
+    findAll(): Promise<any>;
     findOne(id: string): Promise<import("mongoose").Document<unknown, {}, import("./schemas/users.schema").UserDocument> & import("./schemas/users.schema").User & import("mongoose").Document<unknown, any, any> & Required<{
         _id: unknown;
     }> & {

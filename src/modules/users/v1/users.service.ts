@@ -4,23 +4,32 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/users.schema';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class UsersService {
 
     constructor(
         @InjectModel(User.name) private userModel: Model<UserDocument>,
+        private readonly cacheService: CacheService,
     ) {}
 
     private users = [];
 
-    create(createUserDto: CreateUserDto) {
+    async create(createUserDto: CreateUserDto) {
         const createdUser = new this.userModel(createUserDto);
+        await this.cacheService.del('users'); // Clear the cache when a new user is created
         return createdUser.save();
     }
 
-    findAll() {
-        return this.userModel.find().exec();
+    async findAll() {
+        const cachedUsers = await this.cacheService.get('users');
+        if (cachedUsers) {
+            return cachedUsers;
+        }
+        const users = await this.userModel.find().exec();
+        await this.cacheService.set('users', users);
+        return users;
     }
 
     async findOne(id: number) {
@@ -36,6 +45,7 @@ export class UsersService {
         if (!updatedUser) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
+        await this.cacheService.del('users'); // Clear the cache when a user is updated
         return updatedUser;
     }
 
@@ -44,6 +54,7 @@ export class UsersService {
         if (!deleted) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
+        await this.cacheService.del('users'); // Clear the cache when a user is deleted
         return deleted;
     }
 }

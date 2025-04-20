@@ -5,6 +5,7 @@ const app_module_1 = require("./app.module");
 const common_1 = require("@nestjs/common");
 const helmet_1 = require("helmet");
 const express_rate_limit_1 = require("express-rate-limit");
+const http_exception_filter_1 = require("./common/filters/http-exception.filter");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.useGlobalPipes(new common_1.ValidationPipe({
@@ -12,6 +13,7 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
         transform: true,
     }));
+    app.useGlobalFilters(new http_exception_filter_1.MongoExceptionFilter());
     app.enableCors({
         origin: process.env.CORS_ORIGIN ?? '*',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

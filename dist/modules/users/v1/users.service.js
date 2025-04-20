@@ -17,17 +17,26 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const users_schema_1 = require("./schemas/users.schema");
+const cache_service_1 = require("../../../cache/cache.service");
 let UsersService = class UsersService {
-    constructor(userModel) {
+    constructor(userModel, cacheService) {
         this.userModel = userModel;
+        this.cacheService = cacheService;
         this.users = [];
     }
-    create(createUserDto) {
+    async create(createUserDto) {
         const createdUser = new this.userModel(createUserDto);
+        await this.cacheService.del('users');
         return createdUser.save();
     }
-    findAll() {
-        return this.userModel.find().exec();
+    async findAll() {
+        const cachedUsers = await this.cacheService.get('users');
+        if (cachedUsers) {
+            return cachedUsers;
+        }
+        const users = await this.userModel.find().exec();
+        await this.cacheService.set('users', users);
+        return users;
     }
     async findOne(id) {
         const user = await this.userModel.findById(id).exec();
@@ -41,6 +50,7 @@ let UsersService = class UsersService {
         if (!updatedUser) {
             throw new common_1.NotFoundException(`User with ID ${id} not found`);
         }
+        await this.cacheService.del('users');
         return updatedUser;
     }
     async remove(id) {
@@ -48,6 +58,7 @@ let UsersService = class UsersService {
         if (!deleted) {
             throw new common_1.NotFoundException(`User with ID ${id} not found`);
         }
+        await this.cacheService.del('users');
         return deleted;
     }
 };
@@ -55,6 +66,7 @@ exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(users_schema_1.User.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        cache_service_1.CacheService])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

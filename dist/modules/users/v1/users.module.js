@@ -12,6 +12,7 @@ const users_service_1 = require("./users.service");
 const users_controller_1 = require("./users.controller");
 const mongoose_1 = require("@nestjs/mongoose");
 const users_schema_1 = require("./schemas/users.schema");
+const cache_module_1 = require("../../../cache/cache.module");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -19,6 +20,7 @@ exports.UsersModule = UsersModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: users_schema_1.User.name, schema: users_schema_1.UserSchema }]),
+            cache_module_1.CacheModule
         ],
         providers: [users_service_1.UsersService],
         controllers: [users_controller_1.UsersController]

@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { MongoExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
 
@@ -20,6 +21,8 @@ async function bootstrap() {
       transform: true,
     })
   );
+
+  app.useGlobalFilters(new MongoExceptionFilter());
 
   // Enable CORS (Cross-Origin Resource Sharing) for the application
   app.enableCors({
